@@ -1,0 +1,24 @@
+simulation:
+  model_type: "M/M/c"  # Queueing model choice
+  
+  baseline_parameters:
+    arrival_rate: 800.0  # requests/sec
+    service_rate_per_server: 250.0  # requests/sec
+    num_servers: 4
+  
+  latency_caps:
+    min_latency_ms: 4.0  # Physical lower bound
+    max_latency_ms: 9999.0  # Timeout threshold
+  
+  capacity_scaling:
+    backhaul:
+      units_to_bandwidth_mbps: 500
+      provisioning_time_min: 6
+    
+    radio:
+      units_to_capacity_pct: 25
+      provisioning_time_min: 10
+  
+  traffic_patterns:
+    peak_multiplier: 2.5
+    off_peak_multiplier: 0.6

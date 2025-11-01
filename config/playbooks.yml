@@ -1,0 +1,63 @@
+playbooks:
+  backhaul_congestion:
+    safe_actions:
+      - action: reroute_traffic
+        params:
+          target_region: auto
+          share_pct: 30
+        expected_mttr_min: 5
+      
+      - action: enable_cac
+        params:
+          threshold_pct: 95
+        expected_mttr_min: 2
+    
+    aggressive_actions:
+      - action: scale_capacity
+        params:
+          node_type: backhaul
+          units: 2
+        expected_mttr_min: 8
+  
+  radio_overload:
+    safe_actions:
+      - action: load_balance
+        params:
+          redistribute: true
+        expected_mttr_min: 4
+    
+    aggressive_actions:
+      - action: scale_capacity
+        params:
+          node_type: radio
+          units: 1
+        expected_mttr_min: 10
+  
+  dns_flap:
+    safe_actions:
+      - action: switch_dns_upstream
+        params:
+          provider: secondary
+        expected_mttr_min: 1
+    
+    aggressive_actions:
+      - action: restart_dns_service
+        params:
+          graceful: true
+        expected_mttr_min: 3
+
+action_bounds:
+  reroute_traffic:
+    share_pct:
+      min: 10
+      max: 50
+  
+  scale_capacity:
+    units:
+      min: 1
+      max: 5
+  
+  enable_cac:
+    threshold_pct:
+      min: 90
+      max: 99

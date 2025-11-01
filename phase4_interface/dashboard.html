@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healing Agent Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #e2e8f0; }
+        .container { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: auto 1fr; gap: 20px; padding: 20px; height: 100vh; }
+        .header { grid-column: 1 / -1; background: #1e293b; padding: 20px; border-radius: 8px; }
+        .header h1 { font-size: 24px; color: #38bdf8; }
+        
+        /* Real-time Region Tiles */
+        .region-tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .region-card { background: #1e293b; padding: 20px; border-radius: 8px; border-left: 4px solid #38bdf8; }
+        .region-card h3 { color: #38bdf8; margin-bottom: 15px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .kpi { background: #0f172a; padding: 10px; border-radius: 4px; }
+        .kpi-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; }
+        .kpi-value { font-size: 20px; font-weight: bold; margin-top: 5px; }
+        .kpi-value.normal { color: #22c55e; }
+        .kpi-value.warning { color: #f59e0b; }
+        .kpi-value.critical { color: #ef4444; }
+        
+        /* Incident List & Drawer */
+        .incident-panel { background: #1e293b; padding: 20px; border-radius: 8px; max-height: 80vh; overflow-y: auto; }
+        .incident-panel h2 { color: #38bdf8; margin-bottom: 15px; }
+        .incident-item { background: #0f172a; padding: 15px; margin-bottom: 10px; border-radius: 6px; border-left: 4px solid #f59e0b; cursor: pointer; }
+        .incident-item:hover { background: #1e293b; }
+        .incident-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .incident-id { font-weight: bold; color: #38bdf8; }
+        .incident-status { padding: 4px 8px; border-radius: 4px; font-size: 11px; text-transform: uppercase; }
+        .status-active { background: #ef4444; }
+        .status-mitigating { background: #f59e0b; }
+        .status-resolved { background: #22c55e; }
+        .incident-summary { font-size: 13px; color: #cbd5e1; }
+        
+        /* Incident Drawer (expanded) */
+        .incident-drawer { display: none; background: #334155; padding: 15px; margin-top: 10px; border-radius: 6px; }
+        .incident-drawer.active { display: block; }
+        .drawer-section { margin-bottom: 15px; }
+        .drawer-section h4 { color: #38bdf8; margin-bottom: 8px; font-size: 14px; }
+        .evidence-list { list-style: none; }
+        .evidence-list li { padding: 6px 0; font-size: 13px; color: #cbd5e1; }
+        .evidence-list li:before { content: "→ "; color: #38bdf8; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-right: 10px; }
+        .btn-primary { background: #38bdf8; color: #0f172a; }
+        .btn-secondary { background: #64748b; color: #fff; }
+        
+        /* Simulation Playground */
+        .simulation-panel { background: #1e293b; padding: 20px; border-radius: 8px; }
+        .simulation-panel h2 { color: #38bdf8; margin-bottom: 15px; }
+        .slider-group { margin-bottom: 20px; }
+        .slider-group label { display: block; margin-bottom: 8px; color: #cbd5e1; font-size: 14px; }
+        .slider { width: 100%; }
+        .slider-value { color: #38bdf8; font-weight: bold; }
+        .kpi-preview { background: #0f172a; padding: 15px; border-radius: 6px; margin-top: 20px; }
+        .kpi-preview h4 { color: #38bdf8; margin-bottom: 10px; }
+        
+        /* Chat Panel */
+        .chat-panel { background: #1e293b; padding: 20px; border-radius: 8px; display: flex; flex-direction: column; height: 400px; }
+        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 15px; }
+        .chat-message { padding: 10px; margin-bottom: 10px; border-radius: 6px; }
+        .chat-message.user { background: #38bdf8; color: #0f172a; margin-left: 20%; }
+        .chat-message.system { background: #334155; color: #e2e8f0; margin-right: 20%; }
+        .chat-input { display: flex; gap: 10px; }
+        .chat-input input { flex: 1; padding: 10px; border: none; border-radius: 6px; background: #0f172a; color: #e2e8f0; }
+        .chat-input button { padding: 10px 20px; background: #38bdf8; border: none; border-radius: 6px; color: #0f172a; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏥 Healing Agent - Network Operations Dashboard</h1>
+            <p style="margin-top: 8px; color: #94a3b8;">Real-time telecom outage triage and remediation</p>
+        </div>
+        
+        <!-- Real-time Region Tiles -->
+        <div>
+            <div class="region-tiles" id="regionTiles">
+                <!-- Dynamically populated -->
+            </div>
+            
+            <!-- Simulation Playground -->
+            <div class="simulation-panel" style="margin-top: 20px;">
+                <h2>Simulation Playground</h2>
+                <div class="slider-group">
+                    <label>Traffic Multiplier: <span class="slider-value" id="trafficValue">1.0x</span></label>
+                    <input type="range" class="slider" id="trafficSlider" min="0.5" max="3.0" step="0.1" value="1.0">
+                </div>
+                <div class="slider-group">
+                    <label>Capacity Units: <span class="slider-value" id="capacityValue">+0</span></label>
+                    <input type="range" class="slider" id="capacitySlider" min="0" max="5" step="1" value="0">
+                </div>
+                <button class="btn btn-primary" onclick="runSimulation()">Run Simulation</button>
+                <div class="kpi-preview" id="simResults" style="display: none;">
+                    <h4>Predicted KPIs</h4>
+                    <div id="simOutput"></div>
+                </div>
+            </div>
+            
+            <!-- Chat Panel -->
+            <div class="chat-panel" style="margin-top: 20px;">
+                <h2>Chat Assistant</h2>
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Ask about network status...">
+                    <button onclick="sendChat()">Send</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Incident List & Drawer -->
+        <div class="incident-panel" id="incidentPanel">
+            <h2>Active Incidents</h2>
+            <div id="incidentList">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="dashboard.js"></script>
+</body>
+</html>

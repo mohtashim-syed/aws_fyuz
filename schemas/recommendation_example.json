@@ -1,0 +1,32 @@
+{
+  "event_id": "evt_1730427258456_5678",
+  "region": "NorthEast",
+  "site_id": "NE_SITE_003",
+  "actions": [
+    {
+      "action": "reroute_traffic",
+      "params": {
+        "target_region": "MidWest",
+        "share_pct": 30
+      },
+      "mode": "safe"
+    },
+    {
+      "action": "scale_capacity",
+      "params": {
+        "node_type": "backhaul",
+        "units": 2
+      },
+      "mode": "aggressive"
+    }
+  ],
+  "risks": [
+    "Rerouting 30% traffic may increase latency by 8-12ms for affected users",
+    "Scaling capacity requires 4-6 minutes provisioning time"
+  ],
+  "rollback": [
+    "Revert traffic split to original distribution",
+    "Deallocate added backhaul units if utilization drops below 60% for 10 minutes"
+  ],
+  "trace_id": "trace_1730427255123_1234"
+}

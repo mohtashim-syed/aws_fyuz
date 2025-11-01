@@ -1,0 +1,18 @@
+anomaly_detection:
+  z_score_threshold: 3.0
+  absolute_thresholds:
+    backhaul_util_pct: 85.0
+    cpu_load_pct: 90.0
+    packet_loss_pct: 8.0
+    latency_ms: 150.0
+  
+  hysteresis:
+    trigger_consecutive: 3
+    clear_consecutive: 5
+  
+  window_size: 120  # samples
+
+metrics:
+  baseline_packet_loss_pct: 2.0
+  baseline_latency_ms: 45.0
+  baseline_backhaul_util_pct: 60.0

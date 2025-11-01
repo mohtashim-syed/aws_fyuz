@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AnomalyEvent",
+  "type": "object",
+  "required": [
+    "event_id",
+    "started_at",
+    "region",
+    "site_id",
+    "metrics_snapshot",
+    "suspected_symptom",
+    "confidence",
+    "trace_id"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "region": {
+      "type": "string",
+      "minLength": 1
+    },
+    "site_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "metrics_snapshot": {
+      "type": "object",
+      "required": [
+        "packet_loss_pct",
+        "latency_ms",
+        "backhaul_util_pct",
+        "cpu_load_pct",
+        "calls_dropped"
+      ],
+      "properties": {
+        "packet_loss_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "latency_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "backhaul_util_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "cpu_load_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "calls_dropped": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "suspected_symptom": {
+      "type": "string",
+      "enum": [
+        "backhaul_congestion",
+        "radio_overload",
+        "dns_flap",
+        "fiber_cut",
+        "noisy_neighbor",
+        "maintenance",
+        "unknown"
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "trace_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

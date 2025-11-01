@@ -1,0 +1,24 @@
+regions:
+  - name: NorthEast
+    sites:
+      - NE_SITE_001
+      - NE_SITE_002
+      - NE_SITE_003
+  
+  - name: SouthEast
+    sites:
+      - SO_SITE_001
+      - SO_SITE_002
+      - SO_SITE_003
+  
+  - name: MidWest
+    sites:
+      - MI_SITE_001
+      - MI_SITE_002
+      - MI_SITE_003
+  
+  - name: West
+    sites:
+      - WE_SITE_001
+      - WE_SITE_002
+      - WE_SITE_003

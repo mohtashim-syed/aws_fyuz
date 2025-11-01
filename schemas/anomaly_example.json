@@ -1,0 +1,16 @@
+{
+  "event_id": "evt_1730427255789_5432",
+  "started_at": "2025-10-31T23:34:15.789Z",
+  "region": "NorthEast",
+  "site_id": "NE_SITE_003",
+  "metrics_snapshot": {
+    "packet_loss_pct": 12.45,
+    "latency_ms": 156.78,
+    "backhaul_util_pct": 91.2,
+    "cpu_load_pct": 68.5,
+    "calls_dropped": 3
+  },
+  "suspected_symptom": "backhaul_congestion",
+  "confidence": 0.85,
+  "trace_id": "trace_1730427255789_8765"
+}

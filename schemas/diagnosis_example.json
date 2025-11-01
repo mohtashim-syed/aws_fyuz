@@ -1,0 +1,20 @@
+{
+  "event_id": "evt_1730427258456_5678",
+  "region": "NorthEast",
+  "site_id": "NE_SITE_003",
+  "likely_cause": "backhaul_congestion",
+  "evidence": [
+    "Backhaul utilization spiked to 91.2% (threshold: 85%)",
+    "Packet loss increased from baseline 2.1% to 12.45% (5.9x increase)",
+    "Latency rose from 48ms average to 156.78ms (3.3x increase)",
+    "Strong correlation (r=0.94) between backhaul util and packet loss over last 120 samples"
+  ],
+  "alternative_causes": [
+    "fiber_cut",
+    "noisy_neighbor"
+  ],
+  "confidence": 0.92,
+  "ttl": 300,
+  "trace_id": "trace_1730427255123_1234",
+  "explanation": "The backhaul link connecting this site to the core network is saturated at 91% capacity, causing packets to queue and eventually drop. This congestion pattern emerged over the last 3 minutes as traffic volume exceeded the link's provisioned bandwidth. The simultaneous rise in latency and packet loss, combined with normal CPU and memory levels, confirms the bottleneck is in the transport layer rather than local processing. Immediate action to reroute traffic or add capacity will restore service quality within 5-8 minutes."
+}
