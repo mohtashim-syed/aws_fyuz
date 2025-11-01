@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AINOA Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg-main: #0f172a;       /* slate-900 */
+      --bg-card: #1e293b;       /* slate-800 */
+      --text-primary: #f8fafc;  /* slate-50 */
+      --text-dim: #94a3b8;      /* slate-400 */
+      --accent: #38bdf8;        /* sky-400 */
+      --critical: #f87171;      /* red-400 */
+      --ok: #4ade80;            /* green-400 */
+      --warn: #facc15;          /* yellow-400 */
+      --border-radius: 16px;
+      --shadow: 0 24px 64px rgba(0,0,0,0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: radial-gradient(circle at 20% 20%, rgba(56,189,248,0.08) 0%, rgba(15,23,42,0) 60%),
+                  radial-gradient(circle at 80% 0%, rgba(248,113,113,0.08) 0%, rgba(15,23,42,0) 60%),
+                  var(--bg-main);
+      color: var(--text-primary);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto, "Segoe UI", sans-serif;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(400px,100%), 1fr));
+      gap: 20px;
+    }
+
+    header {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      row-gap: 12px;
+    }
+
+    .title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .product-name {
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1.2;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .badge {
+      background: rgba(56,189,248,0.15);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      line-height: 1.4;
+      max-width: 700px;
+    }
+
+    .runtime-info {
+      text-align: right;
+      font-size: 0.7rem;
+      line-height: 1.4;
+      color: var(--text-dim);
+      min-width: 160px;
+    }
+
+    .runtime-info .label {
+      color: var(--text-dim);
+    }
+    .runtime-info .value {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* Card styling */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      min-height: 220px;
+      position: relative;
+      border: 1px solid rgba(148,163,184,0.07);
+    }
+
+    .card-header {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      row-gap: 6px;
+    }
+
+    .card-header .right-meta {
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+
+    .card-body {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      line-height: 1.4rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .critical {
+      color: var(--critical);
+      font-weight: 600;
+    }
+    .ok {
+      color: var(--ok);
+      font-weight: 600;
+    }
+    .warn {
+      color: var(--warn);
+      font-weight: 600;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.75rem;
+      line-height: 1.3rem;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .region-block {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(148,163,184,0.08);
+    }
+    .region-block:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    .region-name {
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .region-kpis {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      line-height: 1.3rem;
+      margin-bottom: 4px;
+    }
+
+    .cell-line {
+      font-size: 0.7rem;
+      color: var(--text-primary);
+      background: rgba(15,23,42,0.4);
+      border-radius: 8px;
+      padding: 6px 8px;
+      line-height: 1.3rem;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+      border: 1px solid rgba(148,163,184,0.07);
+      margin-top: 4px;
+    }
+
+    .footer-hint {
+      grid-column: 1 / -1;
+      color: var(--text-dim);
+      font-size: 0.7rem;
+      line-height: 1.4rem;
+      text-align: center;
+      padding-top: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .footer-hint strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .inline-sev-pill {
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      line-height: 1.2rem;
+      border: 1px solid rgba(0,0,0,0.4);
+      background: rgba(248,113,113,0.1);
+      color: var(--critical);
+      display: inline-block;
+    }
+    .inline-sev-pill.ok {
+      background: rgba(74,222,128,0.08);
+      color: var(--ok);
+    }
+    .inline-sev-pill.warn {
+      background: rgba(250,204,21,0.08);
+      color: var(--warn);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="title-wrap">
+      <div class="product-name">
+        <span>AINOA Console</span>
+        <span class="badge">Autonomous Network Ops</span>
+      </div>
+      <div class="subtitle">
+        Live RAN / 5G telemetry → anomaly detection → AI root-cause analysis →
+        policy recommendation → impact forecast. This is our closed-loop,
+        self-healing network assistant.
+      </div>
+    </div>
+
+    <div class="runtime-info">
+      <div><span class="label">Last refresh:</span> <span class="value" id="lastRefresh">--</span></div>
+      <div><span class="label">Samples ingested:</span> <span class="value" id="sampleCount">--</span></div>
+      <div><span class="label">Active incident:</span> <span class="value" id="incidentId">none</span></div>
+    </div>
+  </header>
+
+  <!-- CARD: REGIONAL HEALTH -->
+  <section class="card">
+    <div class="card-header">
+      <div>Regional Health (Observability Layer)</div>
+      <div class="right-meta" id="regionsMeta">-- regions</div>
+    </div>
+    <div class="card-body" id="regionsBody">
+      loading...
+    </div>
+  </section>
+
+  <!-- CARD: ACTIVE INCIDENT -->
+  <section class="card">
+    <div class="card-header">
+      <div>Active Incident</div>
+      <div class="right-meta mono" id="incidentMeta">none</div>
+    </div>
+    <div class="card-body" id="incidentBody">
+      No active incident.
+    </div>
+  </section>
+
+  <!-- CARD: AI DIAGNOSIS -->
+  <section class="card">
+    <div class="card-header">
+      <div>AI Diagnosis (Cognitive Layer)</div>
+      <div class="right-meta" id="aiRisk">risk: --</div>
+    </div>
+    <div class="card-body" id="aiBody">
+      Waiting for anomaly...
+    </div>
+  </section>
+
+  <!-- CARD: POLICY & FORECAST -->
+  <section class="card">
+    <div class="card-header">
+      <div>Policy & Forecast
+        <span style="color:var(--text-dim); font-weight:400;">
+          (Decision Layer + Planning Agent)
+        </span>
+      </div>
+      <div class="right-meta mono" id="policyMeta">
+        action: --
+      </div>
+    </div>
+    <div class="card-body" id="policyBody">
+      No mitigation proposed.
+    </div>
+  </section>
+
+  <!-- FOOTER / STORYTELLING -->
+  <div class="footer-hint">
+    <strong>Story to tell judges:</strong>
+    "AINOA watches live network KPIs. The moment latency and packet loss spike in a region,
+    AINOA explains what's happening in normal language, proposes a specific control action
+    (like offloading 20% of traffic from cell_12 to cell_15), and forecasts the impact
+    before we actually touch production. That's closed-loop, self-healing 5G ops."
+  </div>
+
+  <script>
+    const STATUS_URL = "http://localhost:8000/status";
+    const HEALTH_URL = "http://localhost:8000/health";
+
+    // elements we will populate
+    const lastRefreshEl  = document.getElementById("lastRefresh");
+    const sampleCountEl  = document.getElementById("sampleCount");
+    const incidentIdEl   = document.getElementById("incidentId");
+
+    const regionsMetaEl  = document.getElementById("regionsMeta");
+    const regionsBodyEl  = document.getElementById("regionsBody");
+
+    const incidentMetaEl = document.getElementById("incidentMeta");
+    const incidentBodyEl = document.getElementById("incidentBody");
+
+    const aiRiskEl       = document.getElementById("aiRisk");
+    const aiBodyEl       = document.getElementById("aiBody");
+
+    const policyMetaEl   = document.getElementById("policyMeta");
+    const policyBodyEl   = document.getElementById("policyBody");
+
+
+    // severity → pill class
+    function sevToClass(sev) {
+      if (!sev) return "inline-sev-pill";
+      const s = sev.toLowerCase();
+      if (s === "critical") return "inline-sev-pill";
+      if (s === "warning")  return "inline-sev-pill warn";
+      return "inline-sev-pill ok";
+    }
+
+    // format regions data block
+    function renderRegions(regions) {
+      if (!regions || regions.length === 0) {
+        return "No telemetry yet.";
+      }
+
+      return regions.map(r => {
+        const regionHeader =
+          `<div class="region-name">
+            <span>${r.region}</span>
+          </div>`;
+
+        const kpis =
+          `<div class="region-kpis">
+            avg latency: <span class="mono">${r.avg_latency_ms} ms</span><br/>
+            avg loss: <span class="mono">${r.avg_packet_loss_pct}%</span><br/>
+            avg throughput: <span class="mono">${r.avg_throughput_mbps} Mbps</span>
+          </div>`;
+
+        // per-cell detail
+        const cellLines = (r.cells || []).map(c => {
+          return (
+            `<div class="cell-line">
+              ${c.cell_id}
+              &nbsp;|&nbsp;lat ${c.latency_ms}ms
+              &nbsp;|&nbsp;loss ${c.packet_loss_pct}%
+              &nbsp;|&nbsp;tp ${c.throughput_mbps}Mbps
+              <br/>
+              <span class="mono" style="color:var(--text-dim);font-size:0.65rem;">
+                ${c.timestamp}
+              </span>
+            </div>`
+          );
+        }).join("");
+
+        return `<div class="region-block">${regionHeader}${kpis}${cellLines}</div>`;
+      }).join("\n");
+    }
+
+    // format incident block
+    function renderIncident(inc) {
+      if (!inc) {
+        incidentMetaEl.textContent = "none";
+        return "No active incident.";
+      }
+
+      // show severity pill
+      const sevClass = sevToClass(inc.severity || "critical");
+      const sevHtml =
+        `<span class="${sevClass}">
+          ${inc.severity || "critical"}
+        </span>`;
+
+      incidentMetaEl.textContent = `${inc.region}/${inc.cell_id}`;
+
+      return `
+        Region: <span class="mono">${inc.region}</span><br/>
+        Cell:   <span class="mono">${inc.cell_id}</span><br/>
+        Severity: ${sevHtml}<br/>
+        Packet Loss: <span class="mono">${inc.packet_loss_pct}%</span><br/>
+        Latency: <span class="mono">${inc.latency_ms} ms</span><br/>
+        Trigger: <span class="mono">${inc.rule_triggered}</span><br/>
+        Time:    <span class="mono">${inc.timestamp}</span>
+      `;
+    }
+
+    // format AI diagnosis
+    function renderAIDiagnosis(ai) {
+      if (!ai) {
+        aiRiskEl.textContent = "risk: --";
+        return "Waiting for anomaly...";
+      }
+
+      aiRiskEl.textContent = `risk: ${ai.risk_level}`;
+      return `
+        <div><strong>Issue:</strong> ${ai.issue_summary}</div>
+        <div><strong>Probable Cause:</strong> ${ai.probable_cause}</div>
+        <div><strong>Recommended Action:</strong> ${ai.suggested_action}</div>
+        <div><strong>Risk Level:</strong> <span class="critical">${ai.risk_level}</span></div>
+      `;
+    }
+
+    // format policy + forecast
+    function renderPolicyAndForecast(policy, forecast) {
+      if (!policy || !forecast) {
+        policyMetaEl.textContent = "action: --";
+        return "No mitigation proposed.";
+      }
+
+      policyMetaEl.textContent = `action: ${policy.action_type}`;
+
+      // forecast.before / forecast.after
+      const beforeLoss    = forecast.before?.packet_loss_pct;
+      const afterLoss     = forecast.after?.packet_loss_pct;
+      const beforeLat     = forecast.before?.latency_ms;
+      const afterLat      = forecast.after?.latency_ms;
+
+      return `
+        <div>
+          <strong>Action:</strong>
+          <span class="mono">${policy.action_type}</span><br/>
+          Source Cell:
+          <span class="mono">${policy.source_cell}</span>
+          → Target Cell:
+          <span class="mono">${policy.target_cell}</span><br/>
+          Offload:
+          <span class="mono">${policy.offload_percent}%</span><br/>
+          Auto-exec:
+          <span class="mono">${policy.can_execute_automatically}</span><br/>
+          Confidence:
+          <span class="mono">${Math.round(policy.confidence * 100)}%</span>
+        </div>
+
+        <div style="margin-top:12px;">
+          <strong>Forecast (Planning Agent):</strong><br/>
+          Loss <span class="mono">${beforeLoss}%</span> → <span class="mono">${afterLoss}%</span><br/>
+          Latency <span class="mono">${beforeLat}ms</span> → <span class="mono">${afterLat}ms</span><br/>
+          <div style="margin-top:8px;" class="mono">${forecast.explanation}</div>
+        </div>
+      `;
+    }
+
+    // fetch and update all cards
+    async function refresh() {
+      try {
+        const [statusRes, healthRes] = await Promise.all([
+          fetch(STATUS_URL),
+          fetch(HEALTH_URL),
+        ]);
+
+        const statusData = await statusRes.json();
+        const healthData = await healthRes.json();
+
+        // 1. header / runtime stats
+        lastRefreshEl.textContent = new Date().toLocaleTimeString();
+        sampleCountEl.textContent = healthData.telemetry_samples ?? "--";
+        incidentIdEl.textContent = healthData.active_incident ?? "none";
+
+        // 2. regions card
+        regionsMetaEl.textContent = `${statusData.regions.length} regions`;
+        regionsBodyEl.innerHTML = renderRegions(statusData.regions);
+
+        // 3. incident card
+        incidentBodyEl.innerHTML = renderIncident(statusData.active_incident);
+
+        // 4. AI diagnosis card
+        aiBodyEl.innerHTML = renderAIDiagnosis(statusData.ai_diagnosis);
+
+        // 5. policy + forecast card
+        policyBodyEl.innerHTML = renderPolicyAndForecast(
+          statusData.proposed_action,
+          statusData.predicted_outcome
+        );
+      } catch (err) {
+        console.error("[AINOA Console] refresh error:", err);
+      }
+    }
+
+    // run immediately, then every 2s
+    refresh();
+    setInterval(refresh, 2000);
+  </script>
+</body>
+</html>
